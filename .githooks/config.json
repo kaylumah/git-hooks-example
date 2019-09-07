@@ -1,0 +1,6 @@
+{
+    "ProtectedBranches": [
+        "master",
+        "release"
+    ]
+}

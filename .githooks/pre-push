@@ -1,0 +1,20 @@
+#!/usr/bin/env dotnet dotnet-script
+#r "nuget: Newtonsoft.Json, 12.0.2"
+#load "logger.csx"
+#load "config.csx"
+#load "git-commands.csx"
+using Newtonsoft.Json;
+
+string currentBranch = GitCommands.CurrentBranch().Trim();
+Config currentConfig = GetConfig();
+bool lockedBranch = currentConfig.ProtectedBranches.Contains(currentBranch);
+
+if (lockedBranch) {
+    Logger.LogError($"Trying to commit on protected branch '{currentBranch}'");
+    Environment.Exit(1);
+}
+
+public static Config GetConfig()
+{
+    return JsonConvert.DeserializeObject<Config>(File.ReadAllText(".githooks/config.json"));
+}
