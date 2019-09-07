@@ -1,0 +1,27 @@
+#!/usr/bin/env dotnet dotnet-script
+#load "logger.csx"
+#load "util.csx"
+#load "git-commands.csx"
+using System.Text.RegularExpressions;
+
+Logger.LogInfo("commit-msg hook");
+
+string commitMessageFilePath = Util.CommandLineArgument(Args, 0);
+string branch = GitCommands.CurrentBranch();
+Logger.LogInfo(commitMessageFilePath);
+Logger.LogInfo(branch);
+string message = GetCommitedMessage(commitMessageFilePath);
+Logger.LogInfo(message);
+
+const string regex = @"\b(feat|bug)\b(\({1}\b(core)\b\){1})?(:){1}(\s){1}(ISS-[0-9]{0,3}){1}";
+var match = Regex.Match(message, regex);
+
+if (!match.Success) {
+    Logger.LogError("Message does not match commit format");
+    Environment.Exit(1);
+}
+
+public static string GetCommitedMessage(string filePath) {
+    return File.ReadAllLines(filePath)[0];
+}
+

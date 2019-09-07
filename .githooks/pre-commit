@@ -1,0 +1,22 @@
+#!/usr/bin/env dotnet dotnet-script
+#load "logger.csx"
+#load "git-commands.csx"
+#load "dotnet-commands.csx"
+
+Logger.LogInfo("pre-commit hook");
+
+// We'll only runchecks on changes that are a part of this commit so let's stash others
+GitCommands.StashChanges();
+
+int formatCode = DotnetCommands.FormatCode();
+int buildCode = DotnetCommands.BuildCode();
+int testCode = DotnetCommands.TestCode();
+
+// We're done with checks, we can unstash changes
+GitCommands.UnstashChanges();
+int exitCode = formatCode + buildCode + testCode;
+if (exitCode != 0) {
+    Logger.LogError("Failed to pass the checks");
+    Environment.Exit(-1);
+}
+// All checks have passed

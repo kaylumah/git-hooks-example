@@ -1,0 +1,41 @@
+#!/usr/bin/env dotnet dotnet-script
+#load "logger.csx"
+#load "util.csx"
+#load "git-commands.csx"
+
+Logger.LogInfo("prepare-commit-msg hook");
+
+string commitMessageFilePath = Util.CommandLineArgument(Args, 0);
+string commitType = Util.CommandLineArgument(Args, 1);
+string commitHash = Util.CommandLineArgument(Args, 2);
+
+if (commitType.Equals("message")) {
+    // user supplied a commit message, no need to prefill.
+    Logger.LogInfo("commitType message");
+    Environment.Exit(0);
+}
+
+string[] files = GitCommands.ChangedFiles();
+for(int i = 0; i < files.Length; i++) {
+    // perhaps determine scope based on what was changed.
+    Logger.LogInfo(files[i]);
+}
+
+string branch = GitCommands.CurrentBranch();
+if (branch.StartsWith("feature")) {
+    string messageToBe = "feat: ISS-XXX";
+    PrepareCommitMessage(commitMessageFilePath, messageToBe);
+}
+
+public static void PrepareCommitMessage(string messageFile, string message)
+{
+     string tempfile = Path.GetTempFileName();
+    using (var writer = new StreamWriter(tempfile))
+    using (var reader = new StreamReader(messageFile))
+    {
+        writer.WriteLine(message);
+        while (!reader.EndOfStream)
+            writer.WriteLine(reader.ReadLine());
+    }
+    File.Copy(tempfile, messageFile, true);
+}
