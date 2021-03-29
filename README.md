@@ -1,6 +1,11 @@
 # git-hooks-example
 
-This repository contains the code used in an experiment to use C# in my githooks.
+This repository contains the source code for my article "Using C# code in your git hooks" which you can find [here](https://kaylumah.nl/2019/09/07/using-csharp-code-your-git-hooks.html).
+If you have any questions or comments about the repo or the blog, feel free to reach out over on twitter [@kaylumah](https://twitter.com/kaylumah).
+
+![Kaylumah Logo](logo.svg)
+
+---
 
 ```sh
 mkdir git-hooks-example
